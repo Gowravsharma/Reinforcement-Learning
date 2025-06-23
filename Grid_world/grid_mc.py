@@ -1,9 +1,9 @@
-import Grid_world.grid_game as game
+import grid_game as game
 import numpy as np
 
 discount_factor = 1
-step_size = 0.1
-num_episodes = 1000
+step_size = 0.01
+num_episodes = 100000
 num_states = game.total_states
 
 state_value = np.zeros(num_states)
@@ -25,4 +25,28 @@ for i in range(num_episodes):
 
     state_value[state]+= step_size*(G - state_value[state])
   #print(state)
-print(state_value.reshape((4,4)))
+print('Multi Visit Monte carlo:' ,'\n', state_value.reshape((4,4)))
+
+def first_visit_mc(num_episodes):
+  for episodes_num in range(num_episodes):
+    initial_state = np.random.choice(game.states)
+    episodes = game.play_game(initial_state) # returns [[state, action], ...]
+
+    G = 0
+    visited = set()
+    state_indices = {}
+
+    for idx,(state,action) in enumerate(episodes):
+      if state not in state_indices:
+        state_indices[state] = idx
+
+    for state, first_idx in state_indices.items():
+      G = 0
+      for t in reversed(range(first_idx, len(episode))):
+        s = episode[t][0]
+        G = discount_factor*G + state_reward[s]
+      state_value[state] += step_size*(G - state_value[state])
+
+first_visit_mc(num_episodes)
+
+print('First Visit Monte carlo:' ,'\n', state_value.reshape((4,4)))
