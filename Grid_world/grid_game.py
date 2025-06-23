@@ -13,10 +13,10 @@ for i in range(total_states):
   transition_prob[i] = {}
   valid_actions = []
   for j in moves:
-    if (j == 'up' and i - rows < 0) or \
-      (j == 'down' and i + rows >= 16) or \
-      (j == 'right' and (i + 1) % rows == 0) or \
-      (j == 'left' and i % rows == 0):
+    if (j == 'up' and i - cols < 0) or \
+      (j == 'down' and i + cols >= 16) or \
+      (j == 'right' and (i + 1) % cols == 0) or \
+      (j == 'left' and i % cols == 0):
       transition_prob[i][j] = 0
       continue
     valid_actions.append(j)
@@ -37,9 +37,9 @@ def sample_next_action(from_state):
 
 def next_state(current_state, action):
   if(action == 'up'):
-    current_state = current_state - 4
+    current_state = current_state - cols
   if(action == 'down'):
-    current_state = current_state + 4
+    current_state = current_state + cols
   if(action == 'left'):
     current_state = current_state - 1
   if(action == 'right'):
@@ -52,7 +52,7 @@ def is_terminal(state):
 def play_game(start_state):
   current_state = start_state
   sampled_states = []
-  while is_terminal(current_state):
+  while not is_terminal(current_state):
     action = sample_next_action(current_state)
     sampled_states.append([current_state,action])
     current_state = next_state(current_state, action)

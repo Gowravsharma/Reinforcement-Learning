@@ -7,7 +7,10 @@ step_size = 0.01
 num_episodes = 100
 num_states = game.total_states
 
-state_value = np.zeros(num_states)
+
+state_value_ev = np.zeros(num_states)
+state_value_fv = np.zeros(num_states)
+
 state_reward = -np.ones(num_states)
 state_reward[num_states-1] = 2
 
@@ -39,11 +42,12 @@ def every_visit_mc(num_episodes):
 
       G = discount_factor*G + reward
 
-      state_value[state]+= step_size*(G - state_value[state])
+      state_value_ev[state]+= step_size*(G - state_value_ev[state])
     #print(state)
 
-every_visit_mc(num_episodes)
-print('Every Visit Monte carlo:' ,'\n', state_value.reshape((4,4)))
+if __name__ == '__main__':
+  every_visit_mc(num_episodes)
+  print('Every Visit Monte carlo:' ,'\n', state_value_ev.reshape((4,4)))
 
 def first_visit_mc(num_episodes):
   for episodes_num in range(num_episodes):
@@ -63,10 +67,11 @@ def first_visit_mc(num_episodes):
       for t in reversed(range(first_idx, len(episodes))):
         s = episodes[t][0]
         G = discount_factor*G + state_reward[s]
-      state_value[state] += step_size*(G - state_value[state])
+      state_value_fv[state] += step_size*(G - state_value_fv[state])
 
-first_visit_mc(num_episodes)
-print('First Visit Monte carlo:' ,'\n', state_value.reshape((4,4)))
+if __name__ == '__main__':
+  first_visit_mc(num_episodes)
+  print('First Visit Monte carlo:' ,'\n', state_value_fv.reshape((4,4)))
 
 # Epsilon Greedy policy
 def epsilon_greedy_action(Q,state):
