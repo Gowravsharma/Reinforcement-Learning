@@ -1,9 +1,9 @@
 import numpy as np
 
 #Grid dimensions
-rows,cols = 4,4
+rows,cols = 5,5
 total_states = rows*cols
-states = np.arange(0,total_states,1) # [0,1,2,..., 15]
+states = np.arange(0,total_states,1) # [0,1,2,..., termial_state]
 terminal_state = total_states-1
 moves = ['up','down','left','right']
 
@@ -14,7 +14,7 @@ for i in range(total_states):
   valid_actions = []
   for j in moves:
     if (j == 'up' and i - cols < 0) or \
-      (j == 'down' and i + cols >= 16) or \
+      (j == 'down' and i + cols >= total_states) or \
       (j == 'right' and (i + 1) % cols == 0) or \
       (j == 'left' and i % cols == 0):
       transition_prob[i][j] = 0
@@ -60,4 +60,4 @@ def play_game(start_state):
 
 
 if __name__ == '__main__':
-  print(play_game(0))  
+  print(play_game(0), play_game(0).shape())  
