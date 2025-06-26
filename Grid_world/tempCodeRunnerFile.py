@@ -1,0 +1,1 @@
+mc.print_path_gridworld(0)

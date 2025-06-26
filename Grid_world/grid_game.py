@@ -12,7 +12,7 @@ class Grid_World:
     
     if not self.transition_prob:
       for i in range(self.total_states):
-        transition_prob[i] = {}
+        self.transition_prob[i] = {}
         valid_actions = []
         for j in moves:
           if (j == 'up' and i - cols < 0) or \
@@ -25,11 +25,12 @@ class Grid_World:
 
         prob = 1 / len(valid_actions)
         for j in valid_actions:
-          transition_prob[i][j] = prob
-  def sample_next_action(self, from_state):
-    actions_probs = [(a, p) for a, p in self.transition_prob[from_state].items() if p > 0]
+          self.transition_prob[i][j] = prob
+  def sample_next_action(self, from_state,policy = None):
+    source = policy if policy else self.transition_prob
+    actions_probs = [(a, p) for a, p in source[from_state].items() if p > 0]
     actions, probs = zip(*actions_probs)
-    return np.random.choice(actions, p=probs)
+    return np.random.choice(actions, p=probs) 
       
   def next_state(self, current_state, action):
     if(action == 'up'):
@@ -45,13 +46,14 @@ class Grid_World:
   def is_terminal(self, state):
     return state == self.terminal_state
 
-  def play_game(self, start_state):
+  def play_game(self, start_state, policy = None):
     current_state = start_state
     sampled_states = []
     while not self.is_terminal(current_state):
-      action = self.sample_next_action(current_state)
+      action = self.sample_next_action(current_state, policy)
       sampled_states.append([current_state,action])
       current_state = self.next_state(current_state, action)
+    sampled_states.append([current_state, None])
     return sampled_states
 
 #Grid dimensions
