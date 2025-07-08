@@ -1,71 +1,55 @@
 import numpy as np
 
-places = [1,2,3,4,5,6,7,8,9]
-blank_places = places
-filled_place = []
+class Player:
+  def __init__(self, name='player'):
+    self.name = name
+    self.filled_place = []
+    self.trajectory = []
 
-class tic_tac_toe:
-  places = [1,2,3,4,5,6,7,8,9]
-  blank_places = places.copy()
-
-  def __init__(self,trajectory = [], filled_place = []):
-    self.filled_place = filled_place
-    self.trajectory = trajectory
-
-  def update_blank_places(self, place):
-    tic_tac_toe.blank_places = [p for p in tic_tac_toe.blank_places if p != place]
-
-  def sample_next_place(self):
-    num_blank_places = len(tic_tac_toe.blank_places)
-
-    if num_blank_places == 0:
+  def move(self, blank_places):
+    if not blank_places:
       return None
-    
-    prob = [1/num_blank_places]*num_blank_places
-    next_place = np.random.choice(tic_tac_toe.blank_places, p = prob)
-    self.update_blank_places(next_place)
+    next_move = np.random.choice(blank_places)
+    self.filled_place.append(next_move)
+    self.trajectory.append(next_move)
+    return next_move
 
-    return next_place
-    
-  def is_terminal_state(self, state):
-    filled_place , blank_place = state
-    terminal_lists = [[1,2,3],[4,5,6],[7,8,9],
-                    [1,4,7],[2,5,8],[3,6,9],
-                    [1,5,9],[3,5,7]]
-    
-    for lst in terminal_lists:
-        if all(pos in filled_place for pos in lst):
-            return True
-    
+class Game:
+  def __init__(self, player1, player2):
+    self.players = [player1, player2]
+    self.blank_places = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    self.turn = 0  # 0 for player1, 1 for player2
+
+  def is_terminal_state(self, filled_place):
+    wins = [[1,2,3],[4,5,6],[7,8,9],
+            [1,4,7],[2,5,8],[3,6,9],
+            [1,5,9],[3,5,7]]
+    for pattern in wins:
+      if all(pos in filled_place for pos in pattern):
+          return True
     return False
 
-  def update_state(self, place):
-    self.filled_place.append(place)
-    curret_state = (self.filled_place.copy(), tic_tac_toe.blank_places.copy())
-    return curret_state 
+  def play(self):
+    while self.blank_places:
+      current_player = self.players[self.turn]
+      move = current_player.move(self.blank_places)
+      if move is None:
+        print("No moves left!")
+        break
+      self.blank_places.remove(move)
 
-  def play_game(self, start_place = None):
-    
-    if start_place is not None:
-      self.trajectory.append(start_place)
-      self.filled_place.append(start_place)
-      self.update_blank_places(start_place)
+      print(f"{current_player.name} move {move}")
 
-    else:
-        intial_place = self.sample_next_place()
-        self.filled_place.append(intial_place)
-    
-    current_state = (self.filled_place.copy(), tic_tac_toe.blank_places.copy())
+      if self.is_terminal_state(current_player.filled_place):
+        print(f"{current_player.name} wins")
+        return
 
-    while not self.is_terminal_state(current_state):
-      place = self.sample_next_place()
-      if place is None:
-        break # no moves left
-      self.trajectory.append(place)
-      current_state = self.update_state(place)
+      self.turn = 1 - self.turn  # switch turn
 
-    return self.trajectory
+    print("Tie")
 
-game1 = tic_tac_toe() 
-print(game1.play_game())
- 
+player1 = Player(name = 'player1')
+player2 = Player(name = 'player2')
+
+game = Game(player1, player2)
+game.play()
