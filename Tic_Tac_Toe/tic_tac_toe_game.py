@@ -16,8 +16,10 @@ class Player:
 
 class Game:
   def __init__(self, player1, player2):
+    self.state = []
     self.players = [player1, player2]
     self.blank_places = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    self.filled_places_players = [[],[]]
     self.turn = 0  # 0 for player1, 1 for player2
 
   def is_terminal_state(self, filled_place):
@@ -28,11 +30,12 @@ class Game:
       if all(pos in filled_place for pos in pattern):
           return True
     return False
-
+  
   def play(self):
     while self.blank_places:
       current_player = self.players[self.turn]
       move = current_player.move(self.blank_places)
+      self.filled_places_players[self.turn].append(move)
       if move is None:
         print("No moves left!")
         break
@@ -53,3 +56,4 @@ player2 = Player(name = 'player2')
 
 game = Game(player1, player2)
 game.play()
+print(game.filled_places_players)
