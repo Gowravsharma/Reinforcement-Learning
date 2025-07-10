@@ -5,14 +5,16 @@ class Player:
     self.name = name
     self.filled_place = []
     self.trajectory = []
+    self.Q_values = {}
 
-  def move(self, blank_places):
+  def move(self, blank_places, state = None):
     if not blank_places:
       return None
     next_move = np.random.choice(blank_places)
     self.filled_place.append(next_move)
     self.trajectory.append(next_move)
     return next_move
+  
 
 class Game:
   def __init__(self, player1, player2):
