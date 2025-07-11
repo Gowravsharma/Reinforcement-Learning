@@ -13,12 +13,16 @@ class TD(Game):
   def TD_control(self, num_episodes):
     for episode in range(num_episodes):
       episode_trace = []
-
+      
+      print(f'self.play is being called in ep: {episode}')
       episodes = self.play()
-      player1 = self.players[self.start_player]
-      player2 = self.players[1-self.start_player]
-      ep1 = episodes[self.start_player]
-      ep2 = episodes[1-self.start_player]
+      player_idx = self.start_player
+      print('self.play called & initializing players')
+      player1 = self.players[player_idx]
+      player2 = self.players[1-player_idx]
+      print('Initialization done & accesing episodes')
+      ep1 = episodes[player_idx]
+      ep2 = episodes[1-player_idx]
       G = 0
 
       for s in range(len(ep1) - 1):
@@ -31,6 +35,7 @@ class TD(Game):
         q_predict = player1.Q[state_t][action_t]
         q_target = reward_tp1 + self.discount_factor * player1.Q[state_tp1][action_tp1]
         player1.Q[state_t][action_t] += self.step_size * (q_target - q_predict)
+      print('Trained')
 
 if __name__ == '__main__':
   player1 = Player(name = 'player1')
