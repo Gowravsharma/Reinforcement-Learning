@@ -12,12 +12,13 @@ class Player:
     if not blank_places:
       return None
     next_move = np.random.choice(blank_places)
-    self.filled_place.append(next_move)
+    #self.filled_place.append(next_move)
     self.trajectory.append(next_move)
     return next_move
 
 class Game:
   def __init__(self, player1, player2):
+    self.winner = 'Tie'
     self.start_player = None
     self.state = []
     self.players = [player1, player2]
@@ -34,11 +35,12 @@ class Game:
           return True
     return False
   
-  def sample_epsilon_greedy_action(self, player, state, epsilon = 0.1):
+  def sample_epsilon_greedy_action(self, player, state, epsilon=0.1):
     state = tuple(map(tuple, state))
+
     if state not in player.Q:
       num_actions = len(self.blank_places)
-      prob = 1/num_actions if num_actions != 0 else 0
+      prob = 1 / num_actions if num_actions != 0 else 0
       player.Q[state] = {act: prob for act in self.blank_places}
       return player.move(self.blank_places)
     else:
@@ -46,23 +48,34 @@ class Game:
         return player.move(self.blank_places)
       else:
         q_values = player.Q[state]
-        return max(q_values, key = q_values.get)
+
+        # Filter to only valid (blank) actions
+        valid_q_values = {a: q for a, q in q_values.items() if a in self.blank_places}
+
+        if not valid_q_values:  # if all actions are invalid (e.g., already taken)
+            return player.move(self.blank_places)  # fall back to random valid move
+
+        move = max(valid_q_values, key=valid_q_values.get)
+        return move
+
       
   def play(self):
     sampled_states = [[],[]]
     self.turn = np.random.choice([0,1])
-    print('start_player ',self.turn)
+    if __name__ == '__main__':
+     print('start_player ',self.turn)
     self.start_player = self.turn
-    print('self.start_player ',self.start_player)
+    if __name__ == '__main__':
+     print('self.start_player ',self.start_player)
 
     while self.blank_places:
       s = []
       current_player = self.players[self.turn]
-      state = self.filled_places_players.copy()
-      s.append(state) # s = [state]
+      state = tuple(map(tuple,self.filled_places_players))
+      s.append(state) # s = [(state)]
       #sampled_states[self.turn].append[state] # inserting state in trajectory i.e., sampled_states[turn][0]
       move = self.sample_epsilon_greedy_action(current_player, state)
-      s.append(move) # s = [state, move]
+      s.append(move) # s = [(state), move]
       #sampled_states[self.turn].append[move] # inserting action after the state i.e., sampled_states[turn][1]
       #self.filled_places_players[self.turn].append(s)
       
@@ -71,23 +84,26 @@ class Game:
         break
       self.blank_places.remove(move)
       current_player.filled_place.append(move)
+      self.filled_places_players[self.turn].append(move)
 
-      #print(f"{current_player.name} move {move}")
+      if __name__ == '__main__':
+       print(f"{current_player.name} move {move}")
 
       if self.is_terminal_state(current_player.filled_place):
         current_player.win = True
-        s.append(10) # s = [state, move, reward(10)]
+        self.winnner = current_player.name
+        s.append(10) # s = [(state), move, reward(10)]
         sampled_states[self.turn].append(s)
-        #print(f"{current_player.name} wins")
+        if __name__ == '__main__':
+         print(f"{current_player.name} wins")
         break #End the game after win
       
       else:
-        s.append(-1) # s = [state, move, reward(-1)]
+        s.append(-1) # s = [(state), move, reward(-1)]
         sampled_states[self.turn].append(s) 
       self.turn = 1 - self.turn  # switch turn
     return sampled_states
 
-    #print("Tie")
 
 if __name__ == '__main__':
   player1 = Player(name = 'player1')
@@ -96,3 +112,4 @@ if __name__ == '__main__':
   game = Game(player1, player2)
   game.play()
   print(game.filled_places_players)
+  print('won : ', game.winnner)
