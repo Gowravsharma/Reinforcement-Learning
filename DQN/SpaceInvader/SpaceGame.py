@@ -8,7 +8,7 @@ class SpaceInvaderGame:
         # Screen
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption('Space Invader')
-        self.icon = pygame.image.load('spaceship.png')
+        self.icon = pygame.image.load('spaceship64.png')
         pygame.display.set_icon(self.icon)
 
         # Background
